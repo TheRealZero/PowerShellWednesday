@@ -1,0 +1,188 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"pwsh","items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"pwsh"},{"name":"value"}]}}
+
+#!markdown
+
+# Pipelines and the Objects Who Love Them
+
+Pipelines are the lifeforce of PowerShell.  Without them, PowerShell would be a glorified command line.  Pipelines allow you to take the output of one command and use it as the input for another command.
+
+It's like a factory production line, objects are passed from one command to the next, each command taking action on the objects it receives, and passing the results down the line.
+
+## RTFM
+
+The official Microsoft documentation can be found here: [about_Pipelines](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines?view=powershell-7.5)
+
+## Learning Where You Are
+
+🚨Useful tip alert!🚨
+
+There are many extremely well-written documents that begin with `about_` aptly named [About Topics](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about?view=powershell-7.5).  
+You can actually read them straight from your terminal! 🤯
+
+For Example:
+
+#!pwsh
+
+Get-Help about_Pipelines
+
+#!markdown
+
+If you recieve an error like the following:
+
+```error
+-------------------------------------------------------------------------------------------
+Get-Help : Get-Help could not find about_Pipelines in a help file in this session. To download updated help topics type: "Update-Help". To get help online, search for the help topic in the TechNet library at
+https:/go.microsoft.com/fwlink/?LinkID=107116.
+At line:1 char:1
++ Get-Help about_Pipelines -ShowWindow
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ResourceUnavailable: (:) [Get-Help], HelpNotFoundException
+    + FullyQualifiedErrorId : HelpNotFound,Microsoft.PowerShell.Commands.GetHelpCommand
+-------------------------------------------------------------------------------------------
+```
+
+
+You likely need to update your help files.  You can do this by running the following command:
+
+```powershell
+-------------------------------------------------------------------------------------------
+Update-Help -Force -ErrorAction SilentlyContinue
+-------------------------------------------------------------------------------------------
+```
+
+Note that this will update the help files for all modules, not just the ones you are using.  This.....can take a while.
+
+But the knowledge you'll gain is worth every second!  Plus you can just do this in another terminal window.
+
+#!markdown
+
+## -ShowWindow
+
+*Bonus points*:  You can use the `-ShowWindow` parameter to open the help file in a new window, so you can continue to read it while you work in the terminal.
+
+```powershell
+-------------------------------------------------------------------------------------------
+Get-Help about_Pipelines -ShowWindow
+-------------------------------------------------------------------------------------------
+```
+
+#!markdown
+
+## When you don't know what you don't know
+
+*Bonus Bonus Points*:
+If you have all your help files updated and ready to go, you can type:
+
+```powershell
+-------------------------------------------------------------------------------------------
+Get-Help about_*
+-------------------------------------------------------------------------------------------
+```
+...but don't press Enter, instead press Ctrl + Space to see a list of all the available about_ topics.  
+
+#!markdown
+
+# So uhhh...pipelines?
+
+Chaining commands together in PowerShell is where the rubber meets the road.  It allows you to use the tools given to you in a bunch of different situations.  In the futue, it will alwso enable you to do the same with the tools you create.
+
+### The Pipe
+
+The pipe is the `|` character.
+
+When you add a pipe to the end of a command, the output of the command will be given to the next command as input.
+
+### Input and Output
+
+`Input`     If you've ever used a PowerShell command, any parameter that you've passed to the command is input.
+
+`Output`    When the command finishes running, the result of the command is output.
+
+#!markdown
+
+# Don't Let PowerShell Out-Smart You
+
+Sometimes a command takes a simple string as input, yet piping an entire object to the command will work just fine too.
+
+It's because PowerShell is `SMART`
+
+I find this can be a bit of a sticking point, and a quick peek at a more advanced topic will help you understand better.
+
+### Get-Service
+
+Let's start by using `Get-Service` to get one of the most important services on your computer:
+
+#!pwsh
+
+Get-Service -Name Fax
+
+#!markdown
+
+This gave us an object with many parameters, including the `Name` parameter, which is a string.
+
+
+I can provide that string as input to the `Set-Service` command, using the `-Name` parameter.
+
+```powershell
+-------------------------------------------------------------------------------------------
+Set-Service -Name 'Fax' -Status 'Automatic'
+-------------------------------------------------------------------------------------------
+```
+Or I can pipe the entire object to the `Set-Service` command, and it will work just as well.
+
+```powershell
+-------------------------------------------------------------------------------------------
+Get-Service -Name 'Fax' | Set-Service -Status 'Automatic'
+-------------------------------------------------------------------------------------------
+```
+
+This may seem a little confusing at first, it's like theres some magic happening in that pipeline.
+And there is.
+
+It's known as [Parameter Binding](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_parameter_binding?view=powershell-7.5)
+
+It's also known as `Writing Good Reusable Code`
+
+Put your pencils down, there's no need to fully grasp Parameter Binding.  I just want to ease your mind about whats really happening in that mysterious pipeline.
+
+Parameter Binding means that when you create a function in PowerShell, you can give it all kinds of leeway in what kind of input it can accept.  
+
+So if you pass a string to the -Name parameter, it knows how to handle that.  
+
+If you pass an entire object representing that service, it has instructions for what to look for to determine what service has been passed in.
+
+#!pwsh
+
+Get-Service -Name Fax | Get-Member
+
+#!pwsh
+
+Get-Service -Name Fax | Set-Service -StartupType Manual
+
+#!markdown
+
+# Let's Recap
+
+* The pipe is the `|` character
+* The pipe takes the output of one command and uses it as the input for the next command
+* The pipe can be used to chain together multiple commands
+* A command that takes a string as input likely also accepts an object as input
+* PowerShell is smart enough to know what to do with the input you give it
+
+With that in mind, let's take a look at some examples of how to use the pipeline in PowerShell.
+
+# Examples of Using the Pipeline in PowerShell
+
+### Where-Object
+
+Get-Service | Where-Object Status -eq 'Running'
+
+### Select-Object
+
+#!pwsh
+
+Get-Service | Where-Object -Property Name -eq 'pla'
+
+Get-Service -Name 'pla'
