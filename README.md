@@ -1,4 +1,4 @@
-#PowerShell Wednesdays
+# PowerShell Wednesday
 
 ## April 16 2025 - Pipelines!
 
