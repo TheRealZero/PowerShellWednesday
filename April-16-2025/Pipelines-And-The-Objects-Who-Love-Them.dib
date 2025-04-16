@@ -177,12 +177,26 @@ With that in mind, let's take a look at some examples of how to use the pipeline
 
 ### Where-Object
 
-Get-Service | Where-Object Status -eq 'Running'
-
-### Select-Object
+Where-Object will take objects as input and only let the objects that match certain criteria continue on through the pipeline.
 
 #!pwsh
 
-Get-Service | Where-Object -Property Name -eq 'pla'
+#This command will get all the services on your computer, and only let the ones that are running continue on through the pipeline.
+Get-Service | Where-Object Status -eq 'Running'
 
-Get-Service -Name 'pla'
+#!markdown
+
+### Select-Object
+Select-Object let's all the objects continue on through the pipeline, but only lets certain properties of the objects continue on through the pipeline.
+
+#!pwsh
+
+Get-Service | Select-Object -Property Name
+
+#!markdown
+
+Select-Object can also let only certain objects through, but only the amount of objects you specify.
+
+#!pwsh
+
+Get-Service | Select-Object -First 5

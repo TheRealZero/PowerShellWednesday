@@ -26,7 +26,7 @@ Function Invoke-Colourizer {
 Function Add-UnicodeIndex {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [ValidateSet("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z")]
+        [ValidatePattern("^[a-zA-Z]{1}$")]
         [ValidateNotNullOrEmpty()]
         [string[]]$Letter
     )
@@ -38,7 +38,7 @@ Function Add-UnicodeIndex {
         }
     }
 }
-$alphabet = @("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z")
+$alphabet = @("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
 
 
 $task1 = @"
@@ -49,6 +49,8 @@ I said "No."
 He said "Then turn these letters into uppercase!"
 "@
 
+$task1Result = $alphabet|Convertto-UpperCase
+
 $task2 =@"
 Hello!  My name is Joe!
 And I work in Automation IT.
@@ -56,6 +58,9 @@ One day my boss came up to me and said "Hey Joe! Are you Busy?"
 I said "No."
 He said "Then append unicode index numbers to the letters you recieve in the pipline or from input into your parameters!"
 "@
+
+$task2Result = $alphabet | Add-UnicodeIndex
+
 $task3 = @"
 Hello!  My name is Joe!
 And I work in Automation IT.
@@ -63,3 +68,14 @@ One day my boss came up to me and said "Hey Joe! Are you Busy?"
 I said "No."
 He said "Then make these letters shine brightly!"
 "@
+
+$task3Result = $alphabet | Invoke-Colourizer -Colour "Cyan"
+
+$task1
+$task1Result
+$task2
+$task2Result
+$task3
+$task3Result
+Write-Output "All together now!"
+$alphabet | Convertto-UpperCase | Add-UnicodeIndex | Invoke-Colourizer -Colour "Cyan"
